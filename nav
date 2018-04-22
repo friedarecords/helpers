@@ -1,0 +1,15 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <ul>
+        <li><a href="?seite=startseite" target="_self">Startseite</a></li>
+        <li><a href="?seite=songliste" target="_self">Songliste</a></li>
+        <li><a href="?seite=interpreten" target="_self">Interpreten</a></li>
+        <li><a href="?seite=showDBs" target="_self">Datenbanken anzeigen</a></li>
+    </ul>
+</body>
