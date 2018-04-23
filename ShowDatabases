@@ -1,0 +1,37 @@
+<?php
+include 'config.php';
+include 'funktionen.php';
+
+try{
+
+    echo '<br>';
+
+    $query = "Show Databases";
+    $stmt = $con->prepare($query);
+    $stmt->execute();
+
+
+    ?>
+    <form method="post">
+            <h2>Alle Datenbanken:</h2>
+            <table border="1px solid black" >
+                <tr>
+                    <th>Datenbank</th>
+                </tr>
+                <?php
+                while($row = $stmt->fetch(PDO::FETCH_NUM))
+                {
+
+                    echo '<tr>
+                          <td align="center">'.$row[0].'</td><td><a href="DBdetails.php?db='.$row[0].'">Details</a>
+                          </tr>';
+                }
+                ?>
+            </table>
+    </form>
+    <?php
+
+}
+catch (PDOException $e) {
+    print $e->getMessage();
+}
