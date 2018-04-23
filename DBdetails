@@ -1,0 +1,52 @@
+<?php
+include 'funktionen.php';
+
+try{
+
+    $db = $_GET['db'];
+
+    $server = 'localhost';
+    $user = 'root';
+    $pwd = '';
+
+    $con = new PDO('mysql:host='.$server.';dbname='.$db.';charset=utf8', $user, $pwd);
+    $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    echo '<br>';
+
+    if(!isset($_GET['tablename'])) {
+
+        $query = "SHOW TABLES";
+        $stmt = $con->prepare($query);
+        $stmt->execute();
+
+        ?>
+            <?php echo '<h2>Datenbank: ' . $db . '</h2>' ?>
+                <table>
+                    <tr>
+                        <th>Tabelle</th>
+                    </tr>
+                    <?php
+                    while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+
+                        echo '<tr>
+                              <td align="center">' . $row[0] . '</td><td><a href="DBdetails.php?db=' . $db . '&tablename=' . $row[0] . '">Details</a>
+                              </tr>';
+                    }
+                    ?>
+                </table>
+        <?php
+    }
+    else{
+        $table = $_GET['tablename'];
+        $query = "DESCRIBE ".$table;
+        $stmt = $con->prepare($query);
+        $stmt->execute();
+
+        echo '<h2>Tabelle: ' . $table . '</h2><br>';
+        showTable($stmt);
+    }
+}
+catch (PDOException $e) {
+    print $e->getMessage();
+}
