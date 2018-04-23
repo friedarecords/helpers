@@ -1,0 +1,73 @@
+<?php
+include 'config.php';
+include 'funktionen.php';
+
+try{
+    if (!isset($_POST['search']) and !isset($_POST['show_songlist']))
+    {
+        echo '<h2>Song suchen</h2>';
+        ?>
+        <form method="post">
+            <label for="In">Interpret:</label>
+            <input type="text" name="to_search" id="In" required placeholder="z.B. Beatles"><br>
+            <input type="submit" name="search" value="Suchen">
+        </form>
+        <?php
+    }
+    else if (isset($_POST['search'])and !isset($_POST['show_pricelist'])) // relevante Interpret anzeigen
+    {
+
+        $search_string_toShow = $_POST['to_search'];
+
+        $query = "select person_id, concat_ws(' ',person_firstname, person_lastname) as Interpret from Person where
+        (Upper(person_firstname) like Upper(?) or
+        Upper(person_lastname) like Upper(?))";
+
+        $search_string = '%'.$search_string_toShow.'%';
+        $stmt = $con->prepare($query);
+        $stmt->execute([$search_string,$search_string]);
+
+
+        ?>
+        <form method="post">
+            <h2>Suche nach: <?php echo $search_string_toShow;?></h2>
+            <table>
+                <tr>
+                    <th>Interpreten:</th>
+                </tr>
+                <?php
+                while($row = $stmt->fetch(PDO::FETCH_NUM))
+                {
+                    echo '<tr>';
+                        echo '<td><input type="radio" name="radio_interpret" value="'.$row[0].'">'.$row[1].'</td>';
+                    echo '</tr>';
+                }
+                ?>
+
+            </table>
+            <input type="submit" name="show_songlist" value="Songliste anzeigen">
+        </form>
+        <?php
+
+    }
+    else if (isset($_POST['show_songlist'])) // Songliste anzeigen
+    {
+       // $person_id = $_POST['radio_interpret'];
+
+        // Dynamische Überschrift
+        $sql = "Select concat_ws(' ', person_firstname, person_lastname) as interpret from person where person_id=?";
+        $stmtPerson = $con->prepare($sql);
+        $stmtPerson->execute([$person_id]);
+        $Person = $stmtPerson->fetch(PDO::FETCH_NUM);
+        echo '<h2>Song von '.$Person[0].'</h2><br>';
+
+    //  Songs+Album des ausgewählten Interpreten anzeigen
+        $query = "select song_name as Song, album_name as Album from Song NATURAL join song_has_album natural join album where person_id=?";
+        $stmtSongs = $con->prepare($query);
+        $stmtSongs->execute([$person_id]);
+        showTable($stmtSongs);
+    }
+}
+catch (PDOException $e) {
+    print $e->getMessage();
+}
