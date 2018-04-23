@@ -1,0 +1,27 @@
+<?php
+echo '<br><h1>Welcome to Frieda Records</h1>';
+echo '<h4>Test</h4><br>';
+include 'config.php';
+include 'funktionen.php';
+
+?>
+<img src="Koala.jpg" alt="Penguins.jpg" width="1000" height="1000">
+
+
+<!--
+$query = 'select getyp_name as \'Art\',
+	   get_name as \'Artikel\',
+       concat_ws(\'/\', gegr_bezeichnung, gegr_flaschen) as \'L/Stück\',
+       get_alkohol as \'Alkohol in Prozent\'
+  from getraenk g, 
+       getraenk_typ gt,
+       getraenkegroesse_getraenk ggg,
+       getraenkegroesse gg
+ where g.getyp_id = gt.getyp_id
+   and g.get_id = ggg.get_id
+   and ggg.gegr_id = gg.gegr_id';
+$stmt = $con->prepare($query);
+$stmt->execute();
+
+showTable($stmt);
+
