@@ -1,0 +1,111 @@
+<?php
+include 'config.php';
+include 'funktionen.php';
+
+try {
+    if (isset($_POST['speichern']) and !isset($_POST['add_interpret']) and !isset($_POST['edit_interpret']))
+    {
+        try{
+
+            $firstname = $_POST['vorname'];
+            $lastname = $_POST['nachname'];
+
+            if ($_POST['order'] = 'insert')
+            {
+                $insert_Person = $con->prepare("insert into person(person_firstname, person_lastname, address_id) value(?,?,?)");
+                $insert_Person->execute(array($firstname, $lastname, 3));
+                echo 'sollte funktioniert haben...';
+                echo '<br><input type="button" name="goback" value="Zurück" onClick="document.location.href=\'interpreten.php\'">';
+
+            }
+            else if ($_POST['order'] = 'update')
+            {
+
+
+            }
+
+        } catch(PDOException $e) {
+            echo $e->getMessage();
+        }
+
+    }
+    else if (!isset($_POST['add_interpret']) and !isset($_POST['edit_interpret'])) // Interpreten anzeigen
+    {
+        echo '<h2>Interpreten:</h2><br>';
+
+       // $sql = "Select person_id,concat_ws(' ', person_firstname, person_lastname) as Interpret, count(song_id) as 'Anzahl Songs' from person natural join song group by interpret";
+        $sql = "Select person_id,concat_ws(' ', person_firstname, person_lastname) as Interpret from person ";
+        $stmtInterpreten = $con->prepare($sql);
+        $stmtInterpreten->execute();
+
+        ?>
+
+            <form method="post">
+                <table>
+                    <tr>
+                        <th>Interpret</th>
+                    </tr>
+                    <?php
+                    while($row = $stmtInterpreten->fetch(PDO::FETCH_NUM))
+                    {
+
+                        echo '<tr>
+                              <td align="center">'.$row[1].'</td>
+                             <!-- <td><input type="submit" name="edit_interpret" value="Bearbeiten"></td>  -->
+                              <td><a href="updateInterpret.php?id='.$row[0].'">Update</a></td>
+                              <td><a href="deleteInterpret.php?id='.$row[0].'">Delete</a></td>
+                              </tr>';
+                    }
+                    ?>
+                </table>
+                <br><input type="submit" name="add_interpret" value="Neuen Interpreten hinzufügen">
+            </form>
+        <?php
+
+
+    }
+    else if (isset($_POST['add_interpret'])and !isset($_POST['edit_interpret'])) // Interpreten hinzufügen
+    {
+
+        ?>
+        <h2>Neuer Interpret</h2><br>
+        <form method="post">
+
+            <label for="vorname">Vorname:</label>
+            <input type="text" name="vorname" placeholder="Vorname" id="vorname">
+            <br>
+            <label for="nachname">Nachname:</label>
+            <input type="text" name="nachname" placeholder="Nachname" id="nachname">
+            <br>
+            <input type="hidden" name="order" id="order" value="insert">
+            <input type="submit" name="speichern" value="Speichern"'>
+            <input type="button" name="abbrechen" value="Abbrechen" onClick="history.go(-1);return true;">
+
+        </form>
+        <?php
+
+    }
+   /* else if (isset($_POST['edit_interpret'])) // Interpreten bearbeiten
+    {
+
+        */?><!--
+        <h2>Interpreten bearbeiten</h2><br>
+        <form method="post">
+
+            <label for="vorname">Vorname:</label>
+            <input type="text" name="vorname" placeholder="Vorname" id="vorname">
+            <br>
+            <label for="nachname">Nachname:</label>
+            <input type="text" name="nachname" placeholder="Nachname" id="nachname">
+            <br>
+            <input type="hidden" name="order" id="order" value="update">
+            <input type="button" name="speichern" value="Speichern"'>
+            <input type="button" name="abbrechen" value="Abbrechen" onClick="history.go(-1);return true;">
+
+        </form>
+        --><?php
+/*    }*/
+}
+catch (PDOException $e) {
+    print $e->getMessage();
+}
