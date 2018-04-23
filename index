@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Frieda Records</title>
+    <link rel="stylesheet" href="Layout.css" type="text/css">
+</head>
+<body>
+<nav>
+    <?php
+        include 'nav.html';
+    ?>
+</nav>
+<main>
+    <?php
+        if (isset($_GET['seite']))
+        {
+            switch ($_GET['seite'])
+            {
+                case 'startseite':
+                    include 'startseite.php';
+                    break;
+                case 'songliste':
+					include 'songliste.php';
+                    break;
+				case 'interpreten':
+                    include 'interpreten.php';
+                    break;
+                case 'showDBs':
+                    include 'ShowDatabases.php';
+                    break;
+            }
+        } else
+        {
+            include 'startseite.php';
+        }
+    ?>
+</main>
+</body>
+</html>
