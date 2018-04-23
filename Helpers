@@ -1,0 +1,148 @@
+<?php
+//--Static_SQL+Table----------------------------------------------------------------------------------------------------
+
+$stmtBuch = $connect->prepare('select Kurs_ID,Kursname,Kurstermin_AbDatum,Person_Nachname from Person,Kurs,Kurstermin,Kursname where Kursleiter_Person_ID=Person_ID and Kursname_Kursname_ID=Kursname_ID and Kurstermin_Kurstermin_ID=Kurstermin_ID');
+if($stmtBuch != null) {
+    $stmtBuch->execute(); //sql ausführen
+    $stmtBuch->store_result();    //in zwischenspeicher ablegen
+    $stmtBuch->bind_result($Kurs_ID, $Kurs_Name, $Startdatum, $Kursleiter);        //auf die jeweiligen variablen binden/schreiben
+
+    echo '<table border="1">
+    <tr>
+        <th>Kurs_ID</th>
+        <th>Bezeichnung</th>
+        <th>Startdatum</th>
+        <th>Kursleiter</th>
+    </tr>';
+
+
+    while ($stmtBuch->fetch()) // fetch = cursor(in sql)
+    {
+        echo '<tr>
+    <td>' . $Kurs_ID . '</td>
+    <td>' . $Kurs_Name . '</td>
+    <td>' . $Startdatum . '</td>
+    <td>' . $Kursleiter . '</td>
+</tr>';
+
+    }
+    echo '</table>';
+    $stmtBuch->close();
+}
+
+
+//----???????????????------------------------------------------------------------------------------------------------------------------
+
+
+    //Daten anzeigen
+    ?>
+    <form action="" method="post">
+        Kunde:<select type="text" name="Kunde" required><br>
+            Kurse:<select type="text" name="Kurs" required><br>
+
+                <?php
+                $selectAutor = $connect->prepare("select * from autor order by aut_nname");
+                $selectAutor->execute();
+                $selectAutor->store_result();
+                $selectAutor->bind_result($id,$nn,$vn1,$vn2, $vn3);
+
+                echo '<select name="autor[]" multiple required><br>';
+                while($selectAutor->fetch())
+                {
+                    echo '<option value="'.$id.'">'.$nn.' '.$vn1.' '.$vn2.' '.$vn3;
+                }
+
+                echo '</select><br>';
+                ?>
+
+
+
+
+                <input type="submit" name="send" value="Anmelden">
+                <input type="submit" name="send" value="Abmelden">
+    </form>
+
+    <?php
+
+
+//----INSERT + ID -----------------------------------------------------------------------------------------
+
+
+    //Daten speichern
+    $titel1 = $_POST['titel1'];
+    $titel2 = $_POST['titel2'];
+    $titel3 = $_POST['titel3'];
+    $isbn = $_POST['isbn'];
+
+
+    $insert = $connect->prepare("insert into buch(buc_titel1, buc_titel2, buc_titel3, buc_isbn13) value(?,?,?,?)");
+
+
+    $insert->bind_param('ssss', $titel1, $titel2, $titel3, $isbn);
+    $insert->execute();
+    $bucID = $insert->insert_id;
+    $insert->close();
+
+//----DB_CONNECT + SELECT + TABLE-Function------------------------------------------------------------------------------
+
+    echo "<table style='border: solid 1px black;'>";
+    echo "<tr><th>Id</th><th>Firstname</th><th>Lastname</th></tr>";
+
+    class TableRows extends RecursiveIteratorIterator {
+        function __construct($it) {
+            parent::__construct($it, self::LEAVES_ONLY);
+        }
+
+        function current() {
+            return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
+        }
+
+        function beginChildren() {
+            echo "<tr>";
+        }
+
+        function endChildren() {
+            echo "</tr>" . "\n";
+        }
+    }
+
+    $servername = "localhost";
+    $username = "username";
+    $password = "password";
+    $dbname = "myDBPDO";
+
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $conn->prepare("SELECT id, firstname, lastname FROM MyGuests");
+        $stmt->execute();
+
+        // set the resulting array to associative
+        $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+            echo $v;
+        }
+    }
+    catch(PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+    $conn = null;
+    echo "</table>";
+
+
+//----Select Single Value (PDO)-----------------------------------------------------------------------------------------------
+
+    $person_id = $_POST['radio_interpret'];
+
+    // Dynamische Überschrift
+    $sql = "Select concat_ws(' ', person_firstname, person_lastname) as interpret from person where person_id=?";
+    $stmtPerson = $con->prepare($sql);
+    $stmtPerson->execute([$person_id]);
+    $Person = $stmtPerson->fetch(PDO::FETCH_NUM);
+    echo '<h2>Song von '.$Person[0].'</h2><br>';
+
+
+
+//----eine Seite zurückspringen-----------------------------------------------------------------------------------------------
+history.go(-1);return true;
+?>
