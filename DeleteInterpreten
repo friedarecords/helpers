@@ -1,0 +1,19 @@
+<?php
+include 'config.php';
+
+$interpret_id = $_GET['id'];
+
+try{
+
+    $sql = "Delete from person where person_id=?";
+    $stmtPerson = $con->prepare($sql);
+    $stmtPerson->execute([$interpret_id]);
+    echo 'Löschen erfolgreich';
+
+    echo '<br><input type="button" name="goback" value="Zurück" onClick="document.location.href=\'interpreten.php\'">';
+
+}
+catch (PDOException $e) {
+    print $e->getMessage();
+}
+
