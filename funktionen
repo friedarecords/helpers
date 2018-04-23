@@ -1,0 +1,35 @@
+<?php
+function showTable($stmt)
+{
+    try {
+        //Anzahl der Spalten auslesen
+        $count = $stmt->columnCount();
+        //array erstellen
+        $attribute = array();
+        //attribute in array erstellen
+        for ($i = 0; $i < $count; $i++) {
+            $attribute[$i] = $stmt->getColumnMeta($i);
+        }
+
+        echo '<table style="text-align: center"><tr>';
+        foreach ($attribute as $a) {
+            echo '<th>' . $a['name'] . '</th>';
+        }
+        echo '</tr>';
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            echo '<tr>';
+            foreach ($row as $r) {
+                echo '<td>' . $r . '</td>';
+            }
+            echo '</tr>';
+        }
+    }
+    catch (PDOException $e) {
+        print $e->getMessage();
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+
+
