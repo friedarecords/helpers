@@ -1,0 +1,54 @@
+<?php
+include 'config.php';
+
+    try {
+        if (!isset($_POST['update'])) {
+
+
+            $id = $_GET['id'];
+            $sql = "Select person_firstname, person_lastname from person where person_id=?";
+            $stmt = $con->prepare($sql);
+            $stmt->bindParam(1, $id);
+            $stmt->execute();
+
+            $person = $stmt->fetch();
+            $vorname = $person['person_firstname'];
+            $nachname = $person['person_lastname'];
+
+
+            ?>
+            <h2>Interpreten bearbeiten</h2><br>
+            <form method="post">
+
+                <label for="vorname">Vorname:</label>
+    <?php  echo'<input type="hidden" name="personid" id="personid" value="'.$id.'">';?>
+    <?php  echo'<input type="text" name="vorname" id="vorname" value="'.$vorname.'">';?>
+                <br>
+                <label for="nachname">Nachname:</label>
+    <?php  echo'<input type="text" name="nachname" id="nachname" value="'.$nachname.'">';?>
+                <br>
+                <input type="submit" name="update" value="Speichern"'>
+                <input type="button" name="abbrechen" value="Abbrechen" onClick="history.go(-1);return true;">
+            </form>
+
+            <?php
+        }
+        else{
+
+            $update = "Update person set person_firstname=?, person_lastname=? where person_id=?";
+            $stmt = $con->prepare($update);
+            $stmt->bindParam(1, $_POST['vorname']);
+            $stmt->bindParam(2, $_POST['nachname']);
+            $stmt->bindParam(3, $_POST['personid']);
+            $stmt->execute();
+
+
+        echo $stmt->rowCount().' Änderungen wurden gespeichert!';
+        echo '<br><input type="button" name="goback" value="Zurück" onClick="document.location.href=\'interpreten.php\'">';
+
+        }
+    }
+    catch (PDOException $e)
+    {
+        print $e->getMessage();
+    }
